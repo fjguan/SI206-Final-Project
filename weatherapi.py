@@ -6,8 +6,8 @@ weather_api_key = '2ce6143e9a79140595e6e926bcb0a044'
 
 location = 'Detroit, Michigan'
 #example dates
-start_date = '2023-09-01'  
-end_date = '2023-12-10'   
+start_date = '2024-09-01'  
+end_date = '2024-12-9'   
 limit = 25 
 
 db_name = "weather_data.db"
