@@ -5,8 +5,8 @@ calendar_api_key = "mEqFBnqUJrid9qOl3seOq8gyYFlPSPyx"
 database_name = "holidays.db"
 country_code = "US"
 location = 'Ann Arbor, Michigan'
-start_date = '2024-09-01'
-end_date = '2024-12-09'
+year = '2024-09-01' 
+year =  '2024-12-09'
 limit = 25 
 
 def fetch_holidays(api_key, country, year):
@@ -96,8 +96,8 @@ def main():
     print("Initializing database...")
     initialize_database(database_name)
 
-    print(f"Fetching holidays for {country_code} in {start_date}...")
-    holidays = fetch_holidays(calendar_api_key, country_code, start_date, end_date)
+    print(f"Fetching holidays for {country_code} in {year}...")
+    holidays = fetch_holidays(calendar_api_key, country_code, year)
 
     if holidays:
         print(f"Fetched {len(holidays)} holidays. Storing in database...")
