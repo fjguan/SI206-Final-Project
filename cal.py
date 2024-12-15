@@ -1,28 +1,26 @@
 import requests
 import sqlite3
-from datetime import datetime
-
 
 # API Key and Configuration
 CALENDAR_API_KEY = "mEqFBnqUJrid9qOl3seOq8gyYFlPSPyx"
 DATABASE_NAME = "holidays.db"
-COUNTRY_CODE = "US" 
-state = "Michigan"
-city = "Ann Arbor"
-YEAR = 2024  
-month = 9
-location = "us-mi"
+COUNTRY_CODE = "US"  # United States
+STATE_CODE = "us-mi"  # Michigan
+YEAR = 2024  # Year to fetch holidays for
+MONTHS = [9, 10, 11, 12]  # September to December
+HOLIDAY_LIMIT = 25  # Total number of rows to store in the database
 
 
-
-def fetch_holidays(api_key, country, year):
+def fetch_holidays(api_key, country, state, year, month):
     """
-    Fetch holiday data from the Calendarific API.
+    Fetch holiday data for a specific month from the Calendarific API.
 
     Args:
         api_key (str): API key for Calendarific.
         country (str): Country code (e.g., "US").
+        state (str): State code (e.g., "us-mi").
         year (int): Year for which to fetch holidays.
+        month (int): Month to fetch holidays for.
 
     Returns:
         list: A list of holiday dictionaries.
@@ -31,10 +29,9 @@ def fetch_holidays(api_key, country, year):
     params = {
         "api_key": api_key,
         "country": country,
+        "location": state,
         "year": year,
         "month": month,
-        "location": location,
-
     }
 
     try:
@@ -46,27 +43,6 @@ def fetch_holidays(api_key, country, year):
         print(f"Error fetching data: {e}")
         return []
 
-def filter_holidays_by_date(holidays, start_date, end_date):
-    """
-    Filter holidays within a specific date range.
-
-    Args:
-        holidays (list): List of holiday dictionaries.
-        start_date (str): Start date in YYYY-MM-DD format.
-        end_date (str): End date in YYYY-MM-DD format.
-
-    Returns:
-        list: Filtered list of holiday dictionaries.
-    """
-    start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
-    end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
-
-    filtered_holidays = [
-        holiday for holiday in holidays
-        if start_date_obj <= datetime.strptime(holiday["date"]["iso"], "%Y-%m-%d") <= end_date_obj
-    ]
-
-    return filtered_holidays
 
 def initialize_database(db_name):
     """
@@ -82,9 +58,10 @@ def initialize_database(db_name):
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS holidays (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
+            name TEXT UNIQUE NOT NULL,
             description TEXT,
             country TEXT NOT NULL,
+            state TEXT,
             date TEXT NOT NULL
         )
     ''')
@@ -93,30 +70,42 @@ def initialize_database(db_name):
     conn.close()
 
 
-def store_holidays_in_db(holidays, db_name):
+def store_holidays_in_db(holidays, db_name, state):
     """
     Store holiday data into the SQLite database.
 
     Args:
         holidays (list): List of holiday dictionaries.
         db_name (str): Name of the SQLite database file.
+        state (str): The state where the holidays are relevant.
     """
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
+    rows_inserted = 0
 
     for holiday in holidays:
-        cursor.execute('''
-            INSERT INTO holidays (name, description, country, date)
-            VALUES (?, ?, ?, ?)
-        ''', (
-            holiday["name"],
-            holiday.get("description", "No description available"),
-            holiday["country"]["id"],
-            holiday["date"]["iso"]
-        ))
+        try:
+            cursor.execute('''
+                INSERT INTO holidays (name, description, country, state, date)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (
+                holiday["name"],
+                holiday.get("description", "No description available"),
+                holiday["country"]["id"],
+                state,
+                holiday["date"]["iso"]
+            ))
+            rows_inserted += 1
+            # Stop inserting if the total limit is reached
+            if rows_inserted >= HOLIDAY_LIMIT:
+                break
+        except sqlite3.IntegrityError:
+            # Skip duplicate holiday names
+            print(f"Duplicate holiday '{holiday['name']}' already exists in the database. Skipping...")
 
     conn.commit()
     conn.close()
+    return rows_inserted
 
 
 def main():
@@ -126,15 +115,23 @@ def main():
     print("Initializing database...")
     initialize_database(DATABASE_NAME)
 
-    print(f"Fetching holidays for {COUNTRY_CODE} in {YEAR}...")
-    holidays = fetch_holidays(CALENDAR_API_KEY, COUNTRY_CODE, YEAR)
+    total_holidays_stored = 0
 
-    if holidays:
-        print(f"Fetched {len(holidays)} holidays. Storing in database...")
-        store_holidays_in_db(holidays, DATABASE_NAME)
-        print("Holiday data stored successfully!")
-    else:
-        print("No holiday data fetched or an error occurred.")
+    # Loop through the months (September to December)
+    for month in MONTHS:
+        if total_holidays_stored >= HOLIDAY_LIMIT:
+            break  # Stop fetching if we've reached the limit
+        print(f"Fetching holidays for {STATE_CODE} in {YEAR}, month: {month}...")
+        holidays = fetch_holidays(CALENDAR_API_KEY, COUNTRY_CODE, STATE_CODE, YEAR, month)
+
+        if holidays:
+            print(f"Fetched {len(holidays)} holidays for month {month}. Storing in database...")
+            rows_inserted = store_holidays_in_db(holidays, DATABASE_NAME, STATE_CODE)
+            total_holidays_stored += rows_inserted
+        else:
+            print(f"No holidays found for month {month} or an error occurred.")
+
+    print(f"Total holidays stored: {total_holidays_stored}")
 
 
 if __name__ == "__main__":
