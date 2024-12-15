@@ -2,13 +2,17 @@ import requests
 import sqlite3
 from datetime import datetime
 
-# Constants
-calendar_api_key = "mEqFBnqUJrid9qOl3seOq8gyYFlPSPyx"
-database_name = "holidays.db"
-country_code = "US"
 
-start_date = "2024-09-01"
-end_date = "2024-12-09"
+# API Key and Configuration
+CALENDAR_API_KEY = "mEqFBnqUJrid9qOl3seOq8gyYFlPSPyx"
+DATABASE_NAME = "holidays.db"
+COUNTRY_CODE = "US" 
+state = "Michigan"
+city = "Ann Arbor"
+YEAR = 2024  
+month = 9 
+location = "us-mi"
+limit = 25 
 
 
 def fetch_holidays(api_key, country, year):
@@ -28,6 +32,9 @@ def fetch_holidays(api_key, country, year):
         "api_key": api_key,
         "country": country,
         "year": year,
+        "month": month,
+        "location": location,
+
     }
 
     try:
@@ -38,7 +45,6 @@ def fetch_holidays(api_key, country, year):
     except requests.RequestException as e:
         print(f"Error fetching data: {e}")
         return []
-
 
 def filter_holidays_by_date(holidays, start_date, end_date):
     """
@@ -62,12 +68,43 @@ def filter_holidays_by_date(holidays, start_date, end_date):
 
     return filtered_holidays
 
+def initialize_database(db_name):
+    """
+    Create or initialize the SQLite database.
+
+    Args:
+        db_name (str): Name of the SQLite database file.
+    """
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+
+    # Create the holidays table if it doesn't exist
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS holidays (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            description TEXT,
+            country TEXT NOT NULL,
+            date TEXT NOT NULL
+        )
+    ''')
+
+    conn.commit()
+    conn.close()
+
+
 def store_holidays_in_db(holidays, db_name):
+    """
+    Store holiday data into the SQLite database.
+
+    Args:
+        holidays (list): List of holiday dictionaries.
+        db_name (str): Name of the SQLite database file.
+    """
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
 
     for holiday in holidays:
-        print(f"Inserting into DB: {holiday['name']} on {holiday['date']['iso']}")
         cursor.execute('''
             INSERT INTO holidays (name, description, country, date)
             VALUES (?, ?, ?, ?)
@@ -79,4 +116,26 @@ def store_holidays_in_db(holidays, db_name):
         ))
 
     conn.commit()
-    conn.close() 
+    conn.close()
+
+
+def main():
+    """
+    Main function to fetch and store holidays in the database.
+    """
+    print("Initializing database...")
+    initialize_database(DATABASE_NAME)
+
+    print(f"Fetching holidays for {COUNTRY_CODE} in {YEAR}...")
+    holidays = fetch_holidays(CALENDAR_API_KEY, COUNTRY_CODE, YEAR)
+
+    if holidays:
+        print(f"Fetched {len(holidays)} holidays. Storing in database...")
+        store_holidays_in_db(holidays, DATABASE_NAME)
+        print("Holiday data stored successfully!")
+    else:
+        print("No holiday data fetched or an error occurred.")
+
+
+if __name__ == "__main__":
+    main()
