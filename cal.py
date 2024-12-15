@@ -10,9 +10,9 @@ COUNTRY_CODE = "US"
 state = "Michigan"
 city = "Ann Arbor"
 YEAR = 2024  
-month = 9 
+month = 9
 location = "us-mi"
-limit = 25 
+
 
 
 def fetch_holidays(api_key, country, year):

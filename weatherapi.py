@@ -6,8 +6,8 @@ weather_api_key = '2ce6143e9a79140595e6e926bcb0a044'
 
 location = 'Ann Arbor, Michigan'
 #example dates
-start_date = '2023-07-01'  
-end_date = '2023-07-10'   
+start_date = '2024-09-01'  
+end_date = '2024-12-09'   
 limit = 25 
 
 db_name = "weather_data.db"
@@ -72,5 +72,6 @@ while current_date <= end_date_obj and new_entries < limit:
     #move to the next date
     current_date += timedelta(days=1)
 
+print(data)
 conn.close()
 print(f"{new_entries} new entries added to the database.")
