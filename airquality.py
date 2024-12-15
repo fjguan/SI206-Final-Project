@@ -1,17 +1,14 @@
 import requests
 import sqlite3
-import pandas as pd
+from datetime import datetime, timedelta
 
-# country = "us"
-# city = "Ann Arbor"
 # ID = 8873
 KEY = "782b9258e860dc55dd506547926a0ceac5ab9097301988e4eecf4cf36b8ccaf4"
-DB = "air_quality.db"
 COUNTRY = "us"
 CITY = "Ann Arbor"
-
-conn = sqlite3.connect(DB)
-curr = conn.cursor()
+start_date = "2024-09-01" 
+end_date = "2024-12-09"  
+limit = 25 
 
 def create_db():
   curr.execute(
@@ -28,6 +25,7 @@ def create_db():
 
   conn.commit() 
 
+
 def insert_data(date, average, parameter, units):
   curr.execute(
     """
@@ -38,6 +36,7 @@ def insert_data(date, average, parameter, units):
   )
 
   conn.commit()
+
 
 def get_city_id():
   url = f'https://api.openaq.org/v2/locations?country={COUNTRY}&city={CITY}'
@@ -52,55 +51,59 @@ def get_city_id():
 
   return id
 
-def fetch_data(location_id, start_date, end_date):
+
+def fetch_data(location_id):
   url = f'https://api.openaq.org/v2/averages'
   headers = {"X-API-KEY": KEY}
 
-  start_date = start_date + "T00:00:00+00:00"
-  end_date = end_date + "T23:59:00+00:00"
-  params = {
-    "temporal": "day",
-    "locations_id": location_id,
-    "date_from": start_date,
-    "date_to": end_date,
-    "limit": 25
-  }
+  curr.execute("SELECT date FROM air_quality")
+  existing_dates = {row[0] for row in curr.fetchall()}
+  
+  date_format = "%Y-%m-%d"
+  date = datetime.strptime(start_date, date_format)
+  end = datetime.strptime(end_date, date_format)
+  new_entries = 0
 
-  response = requests.get(url, headers = headers, params = params)
-  location_data = response.json()
+  while date <= end and new_entries < limit:
+    
+    if str(date.date()) not in existing_dates:
+      start_time = str(date.date()) + "T00:00:00+00:00"
+      end_time = str(date.date()) + "T23:59:00+00:00"
 
-  return response.json()
+      params = {
+        "temporal": "day",
+        "locations_id": location_id,
+        "date_from": start_time,
+        "date_to": end_time
+      }
 
-  # measurements = [{"date": row["day"], "average": row["average"], "parameter": row["parameter"], "units": row["unit"]} for row in location_data["results"]]
-  # df = pd.DataFrame.from_dict(measurements)
+      response = requests.get(url, headers = headers, params = params)
+      location_data = response.json()
 
-  # print(df)
+      process_data(location_data)
+      new_entries += 1
+    
+    date += timedelta(days = 1)
 
-def process_data(start, end):
-  id = get_city_id()
-  data = fetch_data(id, start, end)
+
+def process_data(data):
   for entry in data["results"]:
     date = entry["day"].strip()
-    print(date)
     average = entry["average"]
     parameter = entry["parameter"]
     units = entry["unit"]
     insert_data(date, average, parameter, units)
 
-  curr.execute(
-    """
-    SELECT * FROM air_quality
-    ORDER BY date(date) ASC
-    """
-  )
 
-  conn.commit()
+def main(db):
+  global conn 
+  conn = sqlite3.connect(db)
+  global curr 
+  curr = conn.cursor()
 
-def main():
-  start = input("Enter a starting date (YYYY-MM-DD): ")
-  end = input("Enter an ending date (YYYY-MM-DD): ")
   create_db()
-  process_data(start, end)
+  id = get_city_id()
+  fetch_data(id)
 
 if __name__ == "__main__":
   main()
