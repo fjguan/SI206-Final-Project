@@ -8,6 +8,7 @@ import requests
 import matplotlib as plt
 import weatherapi
 import airquality
+# import cal
 
 def create_db():
   db = "full_database.db"
@@ -15,6 +16,7 @@ def create_db():
   curr = conn.cursor()
   weatherapi.main(db)
   airquality.main(db)
+  # cal.main(db)
 
 
 def main():
