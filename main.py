@@ -6,15 +6,15 @@ Team members: Faye Guan, Jenny Shin, Bryan Holmes
 import sqlite3
 import requests
 import matplotlib as plt
-import weather_copy
-import airqual_copy
+import weatherapi
+import airquality
 
 def create_db():
   db = "full_database.db"
   conn = sqlite3.connect(db)
   curr = conn.cursor()
-  weather_copy.main(db)
-  airqual_copy.main(db)
+  weatherapi.main(db)
+  airquality.main(db)
 
 
 def main():
