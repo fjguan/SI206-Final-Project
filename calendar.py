@@ -4,11 +4,11 @@ import sqlite3
 # API Key and Configuration
 CALENDAR_API_KEY = "mEqFBnqUJrid9qOl3seOq8gyYFlPSPyx"
 DATABASE_NAME = "holidays.db"
-COUNTRY_CODE = "US"  # United States
+COUNTRY_CODE = "US"  
 STATE_CODE = "us-mi"  # Michigan
-YEAR = 2024  # Year to fetch holidays for
+YEAR = 2024  # Year 
 MONTHS = [9, 10, 11, 12]  # September to December
-HOLIDAY_LIMIT = 25  # Total number of rows to store in the database
+HOLIDAY_LIMIT = 25  # rows
 
 
 def fetch_holidays(api_key, country, state, year, month):
@@ -43,7 +43,7 @@ def initialize_database(db_name):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
 
-    # Create the holiday_types table
+    # create the table 
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS holiday_types (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -51,7 +51,7 @@ def initialize_database(db_name):
         )
     ''')
 
-    # Create the holidays table with a foreign key reference to holiday_types
+    # table for foreign key reference to holiday_types
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS holidays (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -77,11 +77,11 @@ def store_holidays_in_db(holidays, db_name, state):
     rows_inserted = 0
 
     for holiday in holidays:
-        # Insert holiday type into the holiday_types table if it doesn't exist
+        # holiday type insert into holiday_type (not exists)
         holiday_type = holiday.get("type", [])
         holiday_type_name = holiday_type[0] if isinstance(holiday_type, list) and holiday_type else "Unknown"
         
-        # Check if the holiday type already exists
+        #  already exists
         cursor.execute('''
             INSERT OR IGNORE INTO holiday_types (type_name)
             VALUES (?)
@@ -106,11 +106,11 @@ def store_holidays_in_db(holidays, db_name, state):
                 holiday["date"]["iso"]
             ))
             rows_inserted += 1
-            # Stop inserting if the total limit is reached
+            # total limit 
             if rows_inserted >= HOLIDAY_LIMIT:
                 break
         except sqlite3.IntegrityError:
-            # Skip duplicate holiday names
+            # no duplicate 
             print(f"Duplicate holiday '{holiday['name']}' already exists in the database. Skipping...")
 
     conn.commit()
@@ -127,10 +127,10 @@ def main():
 
     total_holidays_stored = 0
 
-    # Loop through the months (September to December)
+    # (September to December)
     for month in MONTHS:
         if total_holidays_stored >= HOLIDAY_LIMIT:
-            break  # Stop fetching if we've reached the limit
+            break  # stop for limit 25 
         print(f"Fetching holidays for {STATE_CODE} in {YEAR}, month: {month}...")
         holidays = fetch_holidays(CALENDAR_API_KEY, COUNTRY_CODE, STATE_CODE, YEAR, month)
 
