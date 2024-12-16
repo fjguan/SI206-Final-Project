@@ -5,10 +5,10 @@ Team members: Faye Guan, Jenny Shin, Bryan Holmes
 
 import sqlite3
 import requests
-import matplotlib as plt
+import matplotlib.pyplot as plt
 import weatherapi
 import airquality
-# import cal
+import holiday
 
 db = "full_database.db"
 conn = sqlite3.connect(db)
@@ -18,7 +18,7 @@ def create_db():
   db = "full_database.db"
   weatherapi.main(db)
   airquality.main(db)
-  # cal.main(db)
+  holiday.main(db)
 
 
 def calculations(start_date, end_date):
