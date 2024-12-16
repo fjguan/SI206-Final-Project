@@ -7,7 +7,7 @@ conn = sqlite3.connect(database_path)
 curr = conn.cursor()
 
 def weekly_averages():
-  file = "weekly_averages.txt"
+  file = "weekly_averages.csv"
 
   curr.execute(
     """
