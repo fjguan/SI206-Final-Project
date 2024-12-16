@@ -46,10 +46,6 @@ def weekly_averages():
 
       holiday_count = curr.fetchone()
       writer.writerow([data[prev][0], round(temp_avg, 2), round(aq_avg, 4), holiday_count[0]])
-      # file.write(f"WEEK OF {data[prev][0]}\n")
-      # file.write(f"Average Temperature (°F): {round(temp_avg, 2)}\n")
-      # file.write(f"Average Ozone Level (ppm): {round(aq_avg, 4)}\n")
-      # file.write(f"Holiday Count: {holiday_count[0]}\n\n")
 
       prev = i
 

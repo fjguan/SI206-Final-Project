@@ -32,8 +32,6 @@ def main():
 
     conn.close()
 
-    # print(df)
-
     #double axis plot
     fig, ax1 = plt.subplots(figsize=(12, 6))
 

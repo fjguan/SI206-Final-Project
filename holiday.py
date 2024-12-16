@@ -75,7 +75,6 @@ def store_holidays_in_db(holidays, db_name, state, count):
     """
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
-    # rows_inserted = 0
 
     for holiday in holidays:
         # holiday type insert into holiday_type (not exists)
@@ -113,7 +112,6 @@ def store_holidays_in_db(holidays, db_name, state, count):
                 break
         except sqlite3.IntegrityError:
             # no duplicate 
-            # print(f"Duplicate holiday '{holiday['name']}' already exists in the database. Skipping...")
             pass
 
     conn.commit()
@@ -125,7 +123,6 @@ def main(db):
     """
     Main function to fetch and store holidays in the database.
     """
-    # ("Initializing database...")
     initialize_database(db)
 
     total_holidays_stored = 0
@@ -139,17 +136,13 @@ def main(db):
         holidays = fetch_holidays(CALENDAR_API_KEY, COUNTRY_CODE, STATE_CODE, YEAR, month)
 
         if holidays:
-            # print(f"Fetched {len(holidays)} holidays for month {month}. Storing in database...")
             count = store_holidays_in_db(holidays, db, STATE_CODE, count)
             total_holidays_stored += count
 
         if total_holidays_stored >= HOLIDAY_LIMIT:
             print(f"Holiday limit reached: {HOLIDAY_LIMIT}. Stopping insertion.")
             break
-        # else:
-        #     print(f"No holidays found for month {month} or an error occurred.")
 
-    # print(f"Total holidays stored: {total_holidays_stored}")
 
 
 if __name__ == "__main__":

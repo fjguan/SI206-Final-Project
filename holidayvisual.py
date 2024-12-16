@@ -51,5 +51,5 @@ def main():
     plot_holidays_per_type(holidays_df)
 
 # # Main script execution
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    main()
