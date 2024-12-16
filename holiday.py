@@ -1,5 +1,6 @@
 import requests
 import sqlite3
+import re
 
 # API Key and Configuration
 CALENDAR_API_KEY = "mEqFBnqUJrid9qOl3seOq8gyYFlPSPyx"
@@ -95,6 +96,7 @@ def store_holidays_in_db(holidays, db_name, state, count):
 
         # Insert holiday into the holidays table
         try:
+            pattern = r"^\d{4}-\d{2}-\d{2}"
             cursor.execute('''
                 INSERT INTO holidays (name, holiday_type_id, country, state, date)
                 VALUES (?, ?, ?, ?, ?)
@@ -103,7 +105,7 @@ def store_holidays_in_db(holidays, db_name, state, count):
                 holiday_type_id,
                 holiday["country"]["id"],
                 state,
-                holiday["date"]["iso"]
+                re.findall(pattern, holiday["date"]["iso"])[0]
             ))
             count += 1
             # total limit 
