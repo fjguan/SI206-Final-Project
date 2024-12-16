@@ -4,7 +4,7 @@ import pandas as pd
 import os
 
 # Database Path (absolute path to ensure correctness)
-DATABASE_PATH = os.path.abspath("/Users/zminee/Desktop/final project 206/SI206-Final-Project/holidays.db")
+DATABASE_PATH = os.path.join(os.path.dirname(__file__), "full_database.db")
 
 # Test database connection (using the holidays.database)
 if not os.path.exists(DATABASE_PATH):
@@ -34,7 +34,7 @@ def plot_holidays_per_type(df): #drawing for the holiday visualization
     # x different holiday types 
     # y number of holidays 
     plt.figure(figsize=(10, 6))
-    plt.bar(df['type_name'], df['holiday_count'], color="blue")
+    plt.bar(df['type_name'], df['holiday_count'], color="tab:blue")
     plt.title("Number of Holidays per Holiday Type", fontsize=16)
     plt.xlabel("Holiday Type", fontsize=14)
     plt.ylabel("Number of Holidays", fontsize=14)
@@ -43,10 +43,13 @@ def plot_holidays_per_type(df): #drawing for the holiday visualization
     plt.tight_layout()
     plt.show()
 
-# Main script execution
-if __name__ == "__main__":
+def main(): 
     # Load data from the database
     holidays_df = load_holiday_data(DATABASE_PATH)
 
     # Plot the bar graph
     plot_holidays_per_type(holidays_df)
+
+# # Main script execution
+# if __name__ == "__main__":
+#     main()
