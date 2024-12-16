@@ -35,6 +35,7 @@ def main(db):
 
   new_entries = 0
 
+  print("Storing weather data...")
   while current_date <= end_date_obj and new_entries < limit:
       date_str = current_date.strftime(date_format)
 
@@ -64,10 +65,10 @@ def main(db):
                   conn.commit()
                   
                   new_entries += 1
-                  print(f"Stored data for {date_str}: Avg Temp={avg_temp}, UV Index={uv_index}")
+                  # print(f"Stored data for {date_str}: Avg Temp={avg_temp}, UV Index={uv_index}")
           
-          else:
-              print(f"Skipping {date_str} (already in database)")
+          # else:
+              # print(f"Skipping {date_str} (already in database)")
 
       #move to the next date
       current_date += timedelta(days=1)

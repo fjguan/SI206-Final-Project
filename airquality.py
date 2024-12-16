@@ -10,7 +10,7 @@ start_date = "2024-09-01"
 end_date = "2024-12-09"  
 limit = 25 
 
-def create_db():
+def create_table():
   curr.execute(
     """
     CREATE TABLE IF NOT EXISTS air_quality (
@@ -64,6 +64,7 @@ def fetch_data(location_id):
   end = datetime.strptime(end_date, date_format)
   new_entries = 0
 
+  print("Storing air quality data...")
   while date <= end and new_entries < limit:
     
     if str(date.date()) not in existing_dates:
@@ -84,6 +85,8 @@ def fetch_data(location_id):
       new_entries += 1
     
     date += timedelta(days = 1)
+  
+  print(f"{new_entries} new air quality entries added to the database.")
 
 
 def process_data(data):
@@ -101,7 +104,7 @@ def main(db):
   global curr 
   curr = conn.cursor()
 
-  create_db()
+  create_table()
   id = get_city_id()
   fetch_data(id)
 

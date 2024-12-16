@@ -3,7 +3,7 @@ import sqlite3
 
 # API Key and Configuration
 CALENDAR_API_KEY = "mEqFBnqUJrid9qOl3seOq8gyYFlPSPyx"
-DATABASE_NAME = "holidays.db"
+# DATABASE_NAME = "holidays.db"
 COUNTRY_CODE = "US"  
 STATE_CODE = "us-mi"  # Michigan
 YEAR = 2024  # Year 
@@ -68,13 +68,13 @@ def initialize_database(db_name):
     conn.close()
 
 
-def store_holidays_in_db(holidays, db_name, state):
+def store_holidays_in_db(holidays, db_name, state, count):
     """
     Store holiday data into the SQLite database, including holiday types.
     """
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
-    rows_inserted = 0
+    # rows_inserted = 0
 
     for holiday in holidays:
         # holiday type insert into holiday_type (not exists)
@@ -105,41 +105,47 @@ def store_holidays_in_db(holidays, db_name, state):
                 state,
                 holiday["date"]["iso"]
             ))
-            rows_inserted += 1
+            count += 1
             # total limit 
-            if rows_inserted >= HOLIDAY_LIMIT:
+            if count >= HOLIDAY_LIMIT:
                 break
         except sqlite3.IntegrityError:
             # no duplicate 
-            print(f"Duplicate holiday '{holiday['name']}' already exists in the database. Skipping...")
+            # print(f"Duplicate holiday '{holiday['name']}' already exists in the database. Skipping...")
+            pass
 
     conn.commit()
     conn.close()
-    return rows_inserted
+    return count
 
 
-def main():
+def main(db):
     """
     Main function to fetch and store holidays in the database.
     """
     print("Initializing database...")
-    initialize_database(DATABASE_NAME)
+    initialize_database(db)
 
     total_holidays_stored = 0
+    count = 0
 
     # (September to December)
     for month in MONTHS:
-        if total_holidays_stored >= HOLIDAY_LIMIT:
-            break  # stop for limit 25 
+        # if total_holidays_stored >= HOLIDAY_LIMIT:
+        #     break  # stop for limit 25 
         print(f"Fetching holidays for {STATE_CODE} in {YEAR}, month: {month}...")
         holidays = fetch_holidays(CALENDAR_API_KEY, COUNTRY_CODE, STATE_CODE, YEAR, month)
 
         if holidays:
-            print(f"Fetched {len(holidays)} holidays for month {month}. Storing in database...")
-            rows_inserted = store_holidays_in_db(holidays, DATABASE_NAME, STATE_CODE)
-            total_holidays_stored += rows_inserted
-        else:
-            print(f"No holidays found for month {month} or an error occurred.")
+            # print(f"Fetched {len(holidays)} holidays for month {month}. Storing in database...")
+            count = store_holidays_in_db(holidays, db, STATE_CODE, count)
+            total_holidays_stored += count
+
+        if total_holidays_stored >= HOLIDAY_LIMIT:
+            print(f"Holiday limit reached: {HOLIDAY_LIMIT}. Stopping insertion.")
+            break
+        # else:
+        #     print(f"No holidays found for month {month} or an error occurred.")
 
     print(f"Total holidays stored: {total_holidays_stored}")
 
