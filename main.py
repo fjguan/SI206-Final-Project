@@ -13,6 +13,7 @@ import temperature_ozone_visualization
 import holidayvisual
 import temp_ozone_vis
 import temp_ozone_scatter
+import ozone_holiday_vis
 import calculations
 
 db = "full_database.db"
@@ -29,6 +30,7 @@ def visualizations():
   holidayvisual.main()
   temp_ozone_vis.main()
   temp_ozone_scatter.main()
+  ozone_holiday_vis.main()
 
 
 def calculation():
