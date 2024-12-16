@@ -125,7 +125,7 @@ def main(db):
     """
     Main function to fetch and store holidays in the database.
     """
-    print("Initializing database...")
+    # ("Initializing database...")
     initialize_database(db)
 
     total_holidays_stored = 0
@@ -149,7 +149,7 @@ def main(db):
         # else:
         #     print(f"No holidays found for month {month} or an error occurred.")
 
-    print(f"Total holidays stored: {total_holidays_stored}")
+    # print(f"Total holidays stored: {total_holidays_stored}")
 
 
 if __name__ == "__main__":

@@ -1,9 +1,7 @@
 import sqlite3
 import matplotlib.pyplot as plt
 import re
-import weatherapi
-import airquality
-import holiday
+import os
 
 def plot_data(x, y1, y2, ax1, month):
 
@@ -12,7 +10,7 @@ def plot_data(x, y1, y2, ax1, month):
 
   ax1.set_title(f"{month}")
   ax1.set_xlabel("Day")
-  ax1.set_ylabel("Temperature (F))", color = color1)
+  ax1.set_ylabel("Temperature (°F))", color = color1)
   ax1.plot(x, y1, color = color1)
   ax1.scatter(x, y1, s = 10, color = color1)
   ax1.tick_params(axis = "y", labelcolor = color1)
@@ -44,7 +42,7 @@ def graph_setup():
     aqs.append(round(entry[1], 4))
     temps.append(entry[2])
   
-  fig, axs = plt.subplots(2, 2, figsize = (12, 10))
+  fig, axs = plt.subplots(2, 2, figsize = (12, 6))
   
   sept_days = dates[:30]
   sept_temps = temps[:30]
@@ -67,13 +65,20 @@ def graph_setup():
   dec_aqs = aqs[91:]
   plot_data(dec_days, dec_temps, dec_aqs, axs[1, 1], "December")
 
+  fig.suptitle("Line Plots of Temperature and Ozone Levels for Sept 01 - Dec 09")
   fig.tight_layout()
   plt.show()
 
-def main(db):
+
+def main():
+  database_path = os.path.join(os.path.dirname(__file__), "full_database.db")
   global conn 
-  conn = sqlite3.connect(db)
+  conn = sqlite3.connect(database_path)
   global curr 
   curr = conn.cursor()
 
   graph_setup()
+
+
+if __name__ == "__main__":
+  main()

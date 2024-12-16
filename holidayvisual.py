@@ -7,10 +7,10 @@ import os
 DATABASE_PATH = os.path.join(os.path.dirname(__file__), "full_database.db")
 
 # Test database connection (using the holidays.database)
-if not os.path.exists(DATABASE_PATH):
-    raise FileNotFoundError(f"Error: Database file not found at {DATABASE_PATH}")
-else:
-    print(f"Using database at {DATABASE_PATH}")
+# if not os.path.exists(DATABASE_PATH):
+#     raise FileNotFoundError(f"Error: Database file not found at {DATABASE_PATH}")
+# else:
+#     print(f"Using database at {DATABASE_PATH}")
 
 def load_holiday_data(db_path):
     """
