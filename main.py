@@ -6,9 +6,13 @@ Team members: Faye Guan, Jenny Shin, Bryan Holmes
 import sqlite3
 import requests
 import matplotlib.pyplot as plt
+import re
 import weatherapi
 import airquality
 import holiday
+import temperature_ozone_visualization
+import holidayvisual
+import temp_ozone_vis
 
 db = "full_database.db"
 conn = sqlite3.connect(db)
@@ -59,8 +63,13 @@ def main():
     create_db()
   elif option == "2":
     calculations("2024-11-24", "2024-11-30")
+    temperature_ozone_visualization.main()
+    holidayvisual.main()
+    temp_ozone_vis.main(db)
+
   else:
     print("Invalid option, terminating...")
+
 
 if __name__ == "__main__":
   main()
