@@ -102,7 +102,7 @@ def fetch_data(location_id):
     
     date += timedelta(days = 1)
   
-  print(f"{new_entries} new air quality entries added to the database.")
+  print(f"{new_entries} new entries added to the database.")
 
 
 def process_data(aq, weather, date):

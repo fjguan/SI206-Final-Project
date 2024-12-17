@@ -5,23 +5,23 @@ import os
 import matplotlib.dates as mdates
 
 def main():
-    database_path = os.path.join(os.path.dirname(__file__), "full_database.db")
+    database_path = os.path.join(os.path.dirname(__file__), "database.db")
 
     conn = sqlite3.connect(database_path)
 
     query = """
     SELECT 
-        Weather.date, 
-        Weather.avg_temp, 
-        air_quality.average
+        d.date, 
+        taq.avg_temp_f, 
+        taq.avg_ozone_ppm
     FROM 
-        Weather
+        temp_and_airquality AS taq
     JOIN 
-        air_quality
+        dates AS d
     ON 
-        Weather.date = air_quality.date
+        d.id = taq.date
     WHERE 
-        Weather.date BETWEEN '2024-09-01' AND '2024-12-09';
+        d.date BETWEEN '2024-09-01' AND '2024-12-09';
     """
 
     #load data into pandas dataframe
@@ -36,7 +36,7 @@ def main():
     fig, ax1 = plt.subplots(figsize=(12, 6))
 
     #y-axis: avg temp 
-    ax1.plot(df['date'], df['avg_temp'], color='tab:red', label='Temperature (°F)', marker='o')
+    ax1.plot(df['date'], df['avg_temp_f'], color='tab:red', label='Temperature (°F)', marker='o')
     ax1.set_xlabel('Date', fontsize=12)
     ax1.set_ylabel('Temperature (°F)', color='tab:red', fontsize=12)
     ax1.tick_params(axis='y', labelcolor='tab:red')
@@ -44,7 +44,7 @@ def main():
 
     #y-axis: ozone levels
     ax2 = ax1.twinx()
-    ax2.plot(df['date'], df['average'], color='tab:blue', label='Ozone Level (ppb)', marker='x')
+    ax2.plot(df['date'], df['avg_ozone_ppm'], color='tab:blue', label='Ozone Level (ppm)', marker='x')
     ax2.set_ylabel('Ozone Level (ppm)', color='tab:blue', fontsize=12)
     ax2.tick_params(axis='y', labelcolor='tab:blue')
 

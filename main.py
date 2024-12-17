@@ -26,7 +26,7 @@ def visualizations():
   holidayvisual.main()
   temp_ozone_vis.main()
   temp_ozone_scatter.main()
-  ozone_holiday_vis.main()
+  # ozone_holiday_vis.main()
 
 
 def calculation():

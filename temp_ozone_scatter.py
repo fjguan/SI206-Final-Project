@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-database_path = os.path.join(os.path.dirname(__file__), "full_database.db")
+database_path = os.path.join(os.path.dirname(__file__), "database.db")
 conn = sqlite3.connect(database_path)
 curr = conn.cursor()
 
@@ -13,8 +13,7 @@ def graph():
 
   curr.execute(
     """
-    SELECT aq.average, w.avg_temp FROM air_quality AS aq
-    JOIN Weather AS w ON aq.date = w.date
+    SELECT avg_ozone_ppm, avg_temp_f FROM temp_and_airquality
     """
   )
 

@@ -5,21 +5,20 @@ import os
 
 
 def main():
-    database_path = os.path.join(os.path.dirname(__file__), "full_database.db")
+    database_path = os.path.join(os.path.dirname(__file__), "database.db")
 
     conn = sqlite3.connect(database_path)
 
     query = """
     SELECT 
         holidays.name, 
-        air_quality.average, 
-        holidays.date 
+        taq.avg_ozone_ppm, 
     FROM 
         holidays
     JOIN 
-        air_quality 
+        temp_and_airquality AS taq
     ON 
-        holidays.date = air_quality.date
+        holidays.date_id = taq.date
     WHERE 
         holidays.name IN ('Thanksgiving Day', 'Day After Thanksgiving', 'Halloween', 
         'Labor Day', 'Election Day', 'Black Friday', 'Friday the 13th',
@@ -32,10 +31,10 @@ def main():
     conn.close()
 
     plt.figure(figsize=(10, 6))
-    plt.bar(df['name'], df['average'], color='skyblue', edgecolor='black')
+    plt.bar(df['name'], df['avg_ozone_ppm'], color='skyblue', edgecolor='black')
 
     plt.xlabel('Holiday', fontsize=12)
-    plt.ylabel('Ozone Level (ppb)', fontsize=12)
+    plt.ylabel('Ozone Level (ppm)', fontsize=12)
     plt.title('Ozone Levels on Holidays', fontsize=14)
 
     plt.xticks(rotation=45, ha='right')

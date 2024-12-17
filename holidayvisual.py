@@ -4,7 +4,7 @@ import pandas as pd
 import os
 
 # Database Path (absolute path to ensure correctness)
-DATABASE_PATH = os.path.join(os.path.dirname(__file__), "full_database.db")
+DATABASE_PATH = os.path.join(os.path.dirname(__file__), "database.db")
 
 # Test database connection (using the holidays.database)
 # if not os.path.exists(DATABASE_PATH):
