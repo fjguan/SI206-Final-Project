@@ -2,7 +2,7 @@ import sqlite3
 import os
 import csv
 
-database_path = os.path.join(os.path.dirname(__file__), "full_database.db")
+database_path = os.path.join(os.path.dirname(__file__), "database.db")
 conn = sqlite3.connect(database_path)
 curr = conn.cursor()
 
@@ -11,8 +11,8 @@ def weekly_averages():
 
   curr.execute(
     """
-    SELECT aq.date, aq.average, w.avg_temp FROM air_quality AS aq
-    JOIN Weather AS w ON aq.date = w.date
+    SELECT d.date, taq.avg_ozone_ppm, taq.avg_temp_f FROM temp_and_airquality AS taq
+    JOIN dates AS d ON d.id = taq.date
     """
   )
 
@@ -38,7 +38,8 @@ def weekly_averages():
 
       curr.execute(
         """
-        SELECT COUNT(*) AS holiday_count FROM holidays
+        SELECT COUNT(*) AS holiday_count FROM holidays AS h
+        JOIN dates AS d ON d.id =  h.date_id
         WHERE date BETWEEN ? AND ?
         """,
         (data[prev][0], data[i][0])
