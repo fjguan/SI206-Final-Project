@@ -4,10 +4,7 @@ Team members: Faye Guan, Jenny Shin, Bryan Holmes
 """
 
 import sqlite3
-import requests
-import re
-import weatherapi
-import airquality
+import temp_and_ozone
 import holiday
 import temperature_ozone_visualization
 import holidayvisual
@@ -16,13 +13,12 @@ import temp_ozone_scatter
 import ozone_holiday_vis
 import calculations
 
-db = "full_database.db"
+db = "database.db"
 conn = sqlite3.connect(db)
 curr = conn.cursor()
 
 def create_db():
-  weatherapi.main(db)
-  airquality.main(db)
+  temp_and_ozone.main(db)
   holiday.main(db)
 
 def visualizations():
@@ -38,7 +34,7 @@ def calculation():
 
 
 def main():
-  option = input("1: Database Setup (run five times)\n2: Visualizations\n3: Calculations\nPlease input number: ")
+  option = input("1: Database Setup (run six times)\n2: Visualizations\n3: Calculations\nPlease input number: ")
   if option == "1":
     create_db()
   elif option == "2":

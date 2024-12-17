@@ -3,8 +3,8 @@ import sqlite3
 import re
 
 # API Key and Configuration
-CALENDAR_API_KEY = "mEqFBnqUJrid9qOl3seOq8gyYFlPSPyx"
-# DATABASE_NAME = "holidays.db"
+CALENDAR_API_KEY = "j8FuFKimJ87h4Cu8YrvKQCiwQUubjmtF"
+# DATABASE_NAME = "temp.db"
 COUNTRY_CODE = "US"  
 STATE_CODE = "us-mi"  # Michigan
 YEAR = 2024  # Year 
@@ -60,8 +60,9 @@ def initialize_database(db_name):
             holiday_type_id INTEGER NOT NULL,
             country TEXT NOT NULL,
             state TEXT,
-            date TEXT NOT NULL,
-            FOREIGN KEY (holiday_type_id) REFERENCES holiday_types(id)
+            date_id TEXT NOT NULL,
+            FOREIGN KEY (holiday_type_id) REFERENCES holiday_types(id),
+            FOREIGN KEY (date_id) REFERENCES dates(id)
         )
     ''')
 
@@ -93,18 +94,36 @@ def store_holidays_in_db(holidays, db_name, state, count):
         ''', (holiday_type_name,))
         holiday_type_id = cursor.fetchone()[0]
 
+        pattern = r"^\d{4}-\d{2}-\d{2}"
+        holiday_date = re.findall(pattern, holiday["date"]["iso"])[0]
+
+        cursor.execute(
+            """
+            INSERT OR IGNORE INTO dates (date)
+            VALUES (?)
+            """,
+            (holiday_date,)
+        )
+        cursor.execute(
+            """
+            SELECT id FROM dates WHERE date = ?
+            """,
+            (holiday_date,)
+        )
+        holiday_date_id = cursor.fetchone()[0]
+
         # Insert holiday into the holidays table
         try:
             pattern = r"^\d{4}-\d{2}-\d{2}"
             cursor.execute('''
-                INSERT INTO holidays (name, holiday_type_id, country, state, date)
+                INSERT INTO holidays (name, holiday_type_id, country, state, date_id)
                 VALUES (?, ?, ?, ?, ?)
             ''', (
                 holiday["name"],
                 holiday_type_id,
                 holiday["country"]["id"],
                 state,
-                re.findall(pattern, holiday["date"]["iso"])[0]
+                holiday_date_id
             ))
             count += 1
             # total limit 
